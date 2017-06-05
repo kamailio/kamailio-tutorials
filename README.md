@@ -13,7 +13,7 @@ More details about Kamailio at:
 
 ### Tutorials ###
 
-  * tba
+  * __[kamailio-radius-tutorial](https://github.com/kamailio/kamailio-tutorials/tree/master/kamailio-radius-tutorial)__ - Kamailio With RADIUS Backend
 
 ### Support ###
 
