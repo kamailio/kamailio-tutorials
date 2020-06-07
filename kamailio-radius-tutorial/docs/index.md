@@ -1,4 +1,4 @@
-# Kamailio With RADIUS Backend
+# Kamailio With RADIUS Backend #
 
 **Authors**
 
@@ -48,7 +48,7 @@ storage system supported by AAA server (e.g., database, ldap).
     +---------+                                              +---------+
     | PHONE 1 |<--SIP--+    +-------------------+            | STORAGE |
     +---------+        |    |    SIP SERVER     |            +----+----+
-                       #===>|    (Kamailio)     |                 |        
+                       #===>|    (Kamailio)     |                 |
     ...........        |    |-------------------|         +-------+-------+
                        |    |   RADIUS CLIENT   |<==AAA==>| RADIUS SERVER |
     +---------+        |    | (radiusclient-ng) |         |  (FreeRADIUS) |
@@ -206,9 +206,9 @@ Kamailio which is included in this document.
 #
 
 #
-# NOTE: All standard (IANA registered) attributes are 
-#       commented out except those that are missing in 
-#       the default dictionary of the radiusclient-ng 
+# NOTE: All standard (IANA registered) attributes are
+#       commented out except those that are missing in
+#       the default dictionary of the radiusclient-ng
 #       library.
 #
 
@@ -278,7 +278,8 @@ You can either paste the example above in a new file `/etc/radiusclient-ng/dicti
 
 ## FreeRadius Configuration ##
 
-This part refers only to the configuration items strict related to to the components that interact with `radiusclient-ng` library and `Kamailio` server.
+This part refers only to the configuration items strict related to to the
+components that interact with `radiusclient-ng` library and `Kamailio` server.
 
 **Note**: the files to whom we refer below are located either in
 `/etc/freeradius` or `/usr/local/etc/raddb`.
@@ -472,7 +473,8 @@ RADIUS server.
 
 ### Dictionary File ###
 
-The dictionary file of radiusclient-ng library must include the attributes for Kamailio. Edit the `dictionary` file located either in
+The dictionary file of radiusclient-ng library must include the attributes for
+Kamailio. Edit the `dictionary` file located either in
 `/usr/local/etc/radiusclient-ng/` or `/etc/radiusclient-ng/` and add the
 following line:
 
@@ -503,9 +505,9 @@ radiusd -X
 Create a file named `digest` and put following in it, all in a single line:
 
 ```
-User-Name = "test", Digest-Response = "631d6d73147add2f9e437f59bbc3aeb7", 
-Digest-Realm = "testrealm", Digest-Nonce = "1234abcd" , 
-Digest-Method = "INVITE", Digest-URI = "sip:5555551212@example.com", 
+User-Name = "test", Digest-Response = "631d6d73147add2f9e437f59bbc3aeb7",
+Digest-Realm = "testrealm", Digest-Nonce = "1234abcd",
+Digest-Method = "INVITE", Digest-URI = "sip:5555551212@example.com",
 Digest-Algorithm = "MD5", Digest-User-Name = "test"
 ```
 
@@ -551,11 +553,14 @@ the results, the accounting information is written to syslog as well.
 Group membership checking is performed to allow access to different types of
 services. There are used the following groups:
 
-  * `suspended` - if the user belongs to this group, he is not allowed to to access any VoIP service (registration, incoming or outgoing calls).
+  * `suspended` - if the user belongs to this group, he is not allowed to
+  access any VoIP service (registration, incoming or outgoing calls).
 
-  * `voip` - if the user belongs to this group, he is allowed to register with the SIP server and make VoIP calls.
+  * `voip` - if the user belongs to this group, he is allowed to register with
+  the SIP server and make VoIP calls.
 
-  * `pstn` - if the user belongs to this group, he is allowed to register, call to other VoIP users and to PSTN numbers.
+  * `pstn` - if the user belongs to this group, he is allowed to register,
+  call to other VoIP users and to PSTN numbers.
 
 ```
 #
@@ -579,7 +584,7 @@ alias="kamailio.org"
 #fifo="/tmp/openser_fifo"
 
 # ------------------ module loading ----------------------------------
-mpath="/usr/local/openser-1.0.1/lib/openser/modules"
+mpath="/usr/local/kamailio/lib/kamailio/modules"
 
 loadmodule "mysql.so"
 loadmodule "sl.so"
@@ -601,7 +606,7 @@ loadmodule "avp_radius.so"
 # ----------------- setting module-specific parameters ---------------
 
 # -- usrloc params --
-#modparam("usrloc","db_url","mysql://openser:openserrw@localhost/openser")
+#modparam("usrloc","db_url","mysql://kamailio:kamailiorw@localhost/kamailio")
 modparam("usrloc", "db_mode", 2)
 
 # -- acc params --
@@ -628,17 +633,12 @@ modparam("rr", "enable_full_lr", 1)
 
 # main routing logic
 
-route{
+route {
 
     # initial sanity checks -- messages with
     # max_forwards==0, or excessively long requests
     if (!mf_process_maxfwd_header("10")) {
         sl_send_reply("483","Too Many Hops");
-        exit;
-    };
-
-    if (msg:len >=  2048 ) {
-        sl_send_reply("513", "Message too big");
         exit;
     };
 
@@ -650,7 +650,7 @@ route{
             exit;
         };
     };
-    
+
     # we record-route all messages -- to make sure that
     # subsequent messages will go through our proxy; that's
     # particularly good if upstream and downstream entities
@@ -686,7 +686,7 @@ route{
             };
         };
         # mark routing logic in request
-        append_hf("P-hint: outbound\r\n"); 
+        append_hf("P-hint: outbound\r\n");
         route(1);
     };
 
@@ -724,7 +724,7 @@ route{
             rewritehostport("10.10.10.10:5090");
             route(1);
         };
-        
+
         # load callee's avps
         if(avp_load_radius("callee"))
         {
@@ -741,14 +741,14 @@ route{
                 };
                 # extract 'hours:minutes'
                 avp_subst("i:100/i:102", "/(.{10}) (.{5}):.+/\2/");
-                if((is_avp_set("i:4") && avp_check("i:4", "gt/$time")) 
-                || (is_avp_set("i:5") && avp_check("i:5", "lt/$time"))) {
+                if((is_avp_set("i:4") && avp_check("i:4", "gt/$time"))
+                        || (is_avp_set("i:5") && avp_check("i:5", "lt/$time"))) {
                     sl_send_reply("403", "Forbidden - time");
                     exit;
                 };
             };
         };
-        
+
         # native SIP destinations are handled using our USRLOC DB
         if (!lookup("location")) {
             # log to acc as missed call
@@ -757,7 +757,7 @@ route{
             sl_send_reply("404", "Not Found");
             exit;
         };
-        append_hf("P-hint: usrloc applied\r\n"); 
+        append_hf("P-hint: usrloc applied\r\n");
     };
 
     route(1);
